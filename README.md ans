@@ -1,0 +1,435 @@
+# Express.js RESTful API - Products API
+
+A complete RESTful API built with Express.js featuring CRUD operations, authentication, validation, error handling, and advanced features like filtering, pagination, and search.
+
+## 📋 Features
+
+- **CRUD Operations**: Create, Read, Update, Delete products
+- **Authentication**: API key-based authentication
+- **Validation**: Request body validation middleware
+- **Error Handling**: Comprehensive error handling with custom error classes
+- **Logging**: Request logging middleware
+- **Filtering**: Filter products by category and stock status
+- **Pagination**: Paginated product listings
+- **Search**: Search products by name or description
+- **Statistics**: Get product statistics by category
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <your-repo-url>
+cd express-rest-api
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Create a `.env` file based on `.env.example`:
+```bash
+cp .env.example .env
+```
+
+4. Update the `.env` file with your configuration:
+```
+PORT=3000
+NODE_ENV=development
+API_KEY=your-secret-api-key
+```
+
+### Running the Server
+
+**Development mode (with auto-restart):**
+```bash
+npm run dev
+```
+
+**Production mode:**
+```bash
+npm start
+```
+
+The server will start on `http://localhost:3000`
+
+## 📁 Project Structure
+
+```
+express-rest-api/
+├── server.js                      # Main application file
+├── controllers/
+│   └── productController.js       # Product business logic
+├── routes/
+│   └── productRoutes.js          # API route definitions
+├── middleware/
+│   ├── auth.js                   # Authentication middleware
+│   ├── validation.js             # Validation middleware
+│   ├── logger.js                 # Logging middleware
+│   └── errorHandler.js           # Error handling middleware
+├── utils/
+│   ├── customErrors.js           # Custom error classes
+│   └── asyncHandler.js           # Async error wrapper
+├── package.json
+├── .env.example
+├── .gitignore
+└── README.md
+```
+
+## 🔑 API Documentation
+
+### Authentication
+
+All API endpoints require an API key to be passed in the headers:
+
+```
+x-api-key: your-secret-api-key
+```
+
+### Base URL
+
+```
+http://localhost:3000/api
+```
+
+### Endpoints
+
+#### 1. Get All Products
+
+**GET** `/api/products`
+
+Get a list of all products with optional filtering and pagination.
+
+**Query Parameters:**
+- `category` (optional): Filter by category
+- `inStock` (optional): Filter by stock status (true/false)
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 10)
+
+**Example Request:**
+```bash
+curl -X GET "http://localhost:3000/api/products?category=Electronics&page=1&limit=10" \
+  -H "x-api-key: your-secret-api-key"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "count": 1,
+  "total": 1,
+  "page": 1,
+  "totalPages": 1,
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "Laptop",
+      "description": "High-performance laptop",
+      "price": 999.99,
+      "category": "Electronics",
+      "inStock": true
+    }
+  ]
+}
+```
+
+#### 2. Get Product by ID
+
+**GET** `/api/products/:id`
+
+Get a specific product by its ID.
+
+**Example Request:**
+```bash
+curl -X GET "http://localhost:3000/api/products/550e8400-e29b-41d4-a716-446655440000" \
+  -H "x-api-key: your-secret-api-key"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 999.99,
+    "category": "Electronics",
+    "inStock": true
+  }
+}
+```
+
+#### 3. Create Product
+
+**POST** `/api/products`
+
+Create a new product.
+
+**Request Body:**
+```json
+{
+  "name": "Smartphone",
+  "description": "Latest smartphone model",
+  "price": 699.99,
+  "category": "Electronics",
+  "inStock": true
+}
+```
+
+**Example Request:**
+```bash
+curl -X POST "http://localhost:3000/api/products" \
+  -H "x-api-key: your-secret-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Smartphone",
+    "description": "Latest smartphone model",
+    "price": 699.99,
+    "category": "Electronics",
+    "inStock": true
+  }'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "message": "Product created successfully",
+  "data": {
+    "id": "660e8400-e29b-41d4-a716-446655440001",
+    "name": "Smartphone",
+    "description": "Latest smartphone model",
+    "price": 699.99,
+    "category": "Electronics",
+    "inStock": true
+  }
+}
+```
+
+#### 4. Update Product
+
+**PUT** `/api/products/:id`
+
+Update an existing product.
+
+**Request Body:**
+```json
+{
+  "name": "Updated Product Name",
+  "price": 799.99,
+  "inStock": false
+}
+```
+
+**Example Request:**
+```bash
+curl -X PUT "http://localhost:3000/api/products/550e8400-e29b-41d4-a716-446655440000" \
+  -H "x-api-key: your-secret-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "price": 899.99,
+    "inStock": false
+  }'
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "message": "Product updated successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 899.99,
+    "category": "Electronics",
+    "inStock": false
+  }
+}
+```
+
+#### 5. Delete Product
+
+**DELETE** `/api/products/:id`
+
+Delete a product by ID.
+
+**Example Request:**
+```bash
+curl -X DELETE "http://localhost:3000/api/products/550e8400-e29b-41d4-a716-446655440000" \
+  -H "x-api-key: your-secret-api-key"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "message": "Product deleted successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 899.99,
+    "category": "Electronics",
+    "inStock": false
+  }
+}
+```
+
+#### 6. Search Products
+
+**GET** `/api/products/search?q=query`
+
+Search for products by name or description.
+
+**Query Parameters:**
+- `q` (required): Search query string
+
+**Example Request:**
+```bash
+curl -X GET "http://localhost:3000/api/products/search?q=laptop" \
+  -H "x-api-key: your-secret-api-key"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "count": 1,
+  "query": "laptop",
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "Laptop",
+      "description": "High-performance laptop",
+      "price": 999.99,
+      "category": "Electronics",
+      "inStock": true
+    }
+  ]
+}
+```
+
+#### 7. Get Product Statistics
+
+**GET** `/api/products/stats`
+
+Get statistics about products including count by category, stock status, and average price.
+
+**Example Request:**
+```bash
+curl -X GET "http://localhost:3000/api/products/stats" \
+  -H "x-api-key: your-secret-api-key"
+```
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalProducts": 3,
+    "inStock": 2,
+    "outOfStock": 1,
+    "byCategory": {
+      "Electronics": 1,
+      "Appliances": 1,
+      "Furniture": 1
+    },
+    "averagePrice": "443.32"
+  }
+}
+```
+
+## ⚠️ Error Responses
+
+The API uses standard HTTP status codes and returns errors in the following format:
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Error message here",
+    "errors": ["Additional error details if applicable"]
+  }
+}
+```
+
+**Common Status Codes:**
+- `200` - Success
+- `201` - Created
+- `400` - Bad Request (Validation Error)
+- `401` - Unauthorized (Invalid or missing API key)
+- `404` - Not Found
+- `500` - Internal Server Error
+
+## 🧪 Testing with cURL
+
+Here are some complete examples for testing the API:
+
+**1. Create a product:**
+```bash
+curl -X POST http://localhost:3000/api/products \
+  -H "x-api-key: your-secret-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Gaming Mouse",
+    "description": "RGB gaming mouse with 16000 DPI",
+    "price": 59.99,
+    "category": "Electronics",
+    "inStock": true
+  }'
+```
+
+**2. Get all products with filters:**
+```bash
+curl -X GET "http://localhost:3000/api/products?category=Electronics&page=1&limit=5" \
+  -H "x-api-key: your-secret-api-key"
+```
+
+**3. Search for products:**
+```bash
+curl -X GET "http://localhost:3000/api/products/search?q=coffee" \
+  -H "x-api-key: your-secret-api-key"
+```
+
+**4. Get statistics:**
+```bash
+curl -X GET http://localhost:3000/api/products/stats \
+  -H "x-api-key: your-secret-api-key"
+```
+
+## 🛠️ Development
+
+### Adding New Features
+
+1. Create controller methods in `controllers/productController.js`
+2. Add routes in `routes/productRoutes.js`
+3. Add middleware if needed in `middleware/`
+4. Update error handling if necessary in `utils/customErrors.js`
+
+### Code Style
+
+- Use meaningful variable and function names
+- Add comments for complex logic
+- Follow the existing project structure
+- Handle errors appropriately
+
+## 📝 License
+
+ISC
+
+## 👨‍💻 Author
+
+Your Name
+
+---
+
+Built with ❤️ using Express.js
